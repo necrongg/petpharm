@@ -1,13 +1,12 @@
 // ==UserScript==
-// @name         신세계wms 추가 기능
-// @namespace    https://slp-new.shinsegaefood.com/*
-// @version      2025-08-08
-// @description  GitHub Raw 직통 + 캐시 + TTL 기준 캐시 관리
-// @author       You
-// @match        https://slp-new.shinsegaefood.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=shinsegaefood.com
-// @grant        unsafeWindow
-// @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @name         petPharmAddon
+// @namespace    -
+// @version      2026.04.02
+// @description  2~1년, 3~2년, 4~3년, 5~4년 버튼 추가
+// @match        http://gdadmin.petpharm.co.kr/share/*
+// @grant        none
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
 // ==/UserScript==
 
 (function () {

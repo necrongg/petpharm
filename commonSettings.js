@@ -1,24 +1,21 @@
+const $ = window.jQuery;
 const momentLib = window.moment;
 
 // 안전한 DateTimePicker 주입
 function injectSafeDateTimePicker() {
-    document.querySelectorAll('.js-dateperiod').forEach(function(el) {
-        const targetName = el.dataset.targetName;
-        const elements = document.querySelectorAll(`input[name*="${targetName}"]`);
-
-        if (elements.length > 0) {
-            const parent = elements[0].parentNode;
-            let picker = parent.DateTimePicker;
-
+    $('.js-dateperiod').each(function() {
+        const $elements = $('input[name*="' + $(this).data('target-name') + '"]');
+        if ($elements.length > 0) {
+            const parent = $($elements[0]).parent();
+            let picker = parent.data('DateTimePicker');
             if (!picker || typeof picker.format !== "function") {
-                parent.DateTimePicker = {
+                parent.data('DateTimePicker', {
                     format: function() { return "YYYY-MM-DD"; }
-                };
+                });
             }
         }
     });
 }
-
 injectSafeDateTimePicker();
 const observerSafe = new MutationObserver(() => injectSafeDateTimePicker());
 observerSafe.observe(document.body, { childList: true, subtree: true });
@@ -32,7 +29,7 @@ function createPastYearButton(n) {
     btn.type = "radio";
     btn.name = "searchPeriod";
 
-    const startDays = n * 365;
+    const startDays = n * 364;
     const endDays = (n - 1) * 365;
 
     btn.value = startDays;
@@ -100,6 +97,7 @@ function addPastYearButtons(node) {
     }
 }
 
+
 // 초기 DOM 검사 후 버튼 추가
 document.querySelectorAll('.js-dateperiod').forEach(node => {
     addPastYearButtons(node);
@@ -128,33 +126,29 @@ document.addEventListener('click', function(e) {
 
     const container = target.closest('.js-dateperiod');
 
-    // 기존 active 제거
     container.querySelectorAll('.custom-range-btn.active')
         .forEach(lbl => lbl.classList.remove('active'));
 
-    // 현재 버튼 활성화
     target.classList.add('active');
 
     const startDays = parseInt(input.dataset.rangeStart, 10);
     const endDays = parseInt(input.dataset.rangeEnd, 10);
+    const $elements = $('input[name*="' + container.dataset.targetName + '"]');
 
-    const elements = container.querySelectorAll(`input[name*="${container.dataset.targetName}"]`);
-
-    let format = "YYYY-MM-DD";
+    let $format = "YYYY-MM-DD";
     try {
-        const parent = elements[0].parentNode;
-        const picker = parent.DateTimePicker;
+        const picker = $($elements[0]).parent().data('DateTimePicker');
         if (picker && typeof picker.format === "function") {
-            format = picker.format();
+            $format = picker.format();
         }
     } catch (err) {
         console.warn("format 접근 실패, 기본 포맷 사용:", err);
     }
 
     const base = momentLib().hours(0).minutes(0).seconds(0);
-    const startDate = base.clone().subtract(startDays, 'days').format(format);
-    const endDate = base.clone().hours(23).minutes(59).seconds(0).subtract(endDays, 'days').format(format);
+    const startDate = base.clone().subtract(startDays, 'days').format($format);
+    const endDate = base.clone().hours(23).minutes(59).seconds(0).subtract(endDays, 'days').format($format);
 
-    elements[0].value = startDate;
-    elements[1].value = endDate;
+    $($elements[0]).val(startDate);
+    $($elements[1]).val(endDate);
 });

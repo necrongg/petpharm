@@ -1,17 +1,3 @@
-// ==UserScript==
-// @name         petPharmAddon
-// @namespace    -
-// @version      2026.04.02
-// @description  2~1년, 3~2년, 4~3년, 5~4년 버튼 추가
-// @match        http://gdadmin.petpharm.co.kr/share/*
-// @grant        none
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
-// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
-// ==/UserScript==
-
-(function() {
-    'use strict';
-
     const style = document.createElement('style');
     style.textContent = `
         .js-dateperiod label.active,
@@ -178,4 +164,3 @@ function addPastYearButtons(node) {
         $($elements[0]).val(startDate);
         $($elements[1]).val(endDate);
     });
-})();

@@ -1,15 +1,3 @@
-    const style = document.createElement('style');
-    style.textContent = `
-        .js-dateperiod label.active,
-        .js-dateperiod-months label.active,
-        .js-dateperiod .custom-range-btn.active {
-            background: #666666 !important;
-            border-color: #666666;
-            color: #FFFFFF;
-        }
-    `;
-    document.head.appendChild(style);
-
     const $ = window.jQuery;
     const momentLib = window.moment;
 

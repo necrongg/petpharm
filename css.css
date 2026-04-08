@@ -1,0 +1,7 @@
+.js-dateperiod label.active,
+.js-dateperiod-months label.active,
+.js-dateperiod .custom-range-btn.active {
+    background: #666666 !important;
+    border-color: #666666;
+    color: #FFFFFF;
+}

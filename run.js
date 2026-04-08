@@ -12,7 +12,7 @@
 (function () {
     'use strict';
 
-    const baseUrl = 'https://raw.githubusercontent.com/necrongg/shinsegae/refs/heads/main/';
+    const baseUrl = 'https://raw.githubusercontent.com/necrongg/petpharm/refs/heads/main/';
     const savedScripts = localStorage.getItem('wmsScriptSet');
     const defaultScripts = ['css.css', 'commonSettings.js'];
     const scriptsToLoad = savedScripts ? JSON.parse(savedScripts) : defaultScripts;

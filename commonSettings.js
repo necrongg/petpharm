@@ -1,70 +1,73 @@
-    const $ = window.jQuery;
-    const momentLib = window.moment;
+const momentLib = window.moment;
 
-    // 안전한 DateTimePicker 주입
-    function injectSafeDateTimePicker() {
-        $('.js-dateperiod').each(function() {
-            const $elements = $('input[name*="' + $(this).data('target-name') + '"]');
-            if ($elements.length > 0) {
-                const parent = $($elements[0]).parent();
-                let picker = parent.data('DateTimePicker');
-                if (!picker || typeof picker.format !== "function") {
-                    parent.data('DateTimePicker', {
-                        format: function() { return "YYYY-MM-DD"; }
-                    });
-                }
+// 안전한 DateTimePicker 주입
+function injectSafeDateTimePicker() {
+    document.querySelectorAll('.js-dateperiod').forEach(function(el) {
+        const targetName = el.dataset.targetName;
+        const elements = document.querySelectorAll(`input[name*="${targetName}"]`);
+
+        if (elements.length > 0) {
+            const parent = elements[0].parentNode;
+            let picker = parent.DateTimePicker;
+
+            if (!picker || typeof picker.format !== "function") {
+                parent.DateTimePicker = {
+                    format: function() { return "YYYY-MM-DD"; }
+                };
             }
-        });
-    }
-    injectSafeDateTimePicker();
-    const observerSafe = new MutationObserver(() => injectSafeDateTimePicker());
-    observerSafe.observe(document.body, { childList: true, subtree: true });
+        }
+    });
+}
 
-    // 커스텀 버튼 생성 함수 (n년~(n-1)년)
-    function createPastYearButton(n) {
-        const wrapper = document.createElement('label');
-        wrapper.className = "btn btn-white btn-sm hand custom-range-btn";
+injectSafeDateTimePicker();
+const observerSafe = new MutationObserver(() => injectSafeDateTimePicker());
+observerSafe.observe(document.body, { childList: true, subtree: true });
 
-        const btn = document.createElement('input');
-        btn.type = "radio";
-        btn.name = "searchPeriod";
+// 커스텀 버튼 생성 함수 (n년~(n-1)년)
+function createPastYearButton(n) {
+    const wrapper = document.createElement('label');
+    wrapper.className = "btn btn-white btn-sm hand custom-range-btn";
 
-        const startDays = n * 365;
-        const endDays = (n - 1) * 365;
+    const btn = document.createElement('input');
+    btn.type = "radio";
+    btn.name = "searchPeriod";
 
-        btn.value = startDays;
-        btn.dataset.rangeStart = startDays;
-        btn.dataset.rangeEnd = endDays;
+    const startDays = n * 365;
+    const endDays = (n - 1) * 365;
 
-        wrapper.appendChild(btn);
-        wrapper.appendChild(document.createTextNode(`${n}년~${n-1}년`));
+    btn.value = startDays;
+    btn.dataset.rangeStart = startDays;
+    btn.dataset.rangeEnd = endDays;
 
-        return wrapper;
-    }
+    wrapper.appendChild(btn);
+    wrapper.appendChild(document.createTextNode(`${n}년~${n-1}년`));
 
-    // 커스텀 버튼 생성 함수 (오늘~10년전)
-    function createTodayToPastButton() {
-        const wrapper = document.createElement('label');
-        wrapper.className = "btn btn-white btn-sm hand custom-range-btn";
+    return wrapper;
+}
 
-        const btn = document.createElement('input');
-        btn.type = "radio";
-        btn.name = "searchPeriod";
+// 커스텀 버튼 생성 함수 (오늘~10년전)
+function createTodayToPastButton() {
+    const wrapper = document.createElement('label');
+    wrapper.className = "btn btn-white btn-sm hand custom-range-btn";
 
-        const startDays = 10 * 365;
-        const endDays = 0;
+    const btn = document.createElement('input');
+    btn.type = "radio";
+    btn.name = "searchPeriod";
 
-        btn.value = "9999";
-        btn.dataset.rangeStart = startDays;
-        btn.dataset.rangeEnd = endDays;
+    const startDays = 10 * 365;
+    const endDays = 0;
 
-        wrapper.appendChild(btn);
-        wrapper.appendChild(document.createTextNode("전체"));
+    btn.value = "9999";
+    btn.dataset.rangeStart = startDays;
+    btn.dataset.rangeEnd = endDays;
 
-        return wrapper;
-    }
+    wrapper.appendChild(btn);
+    wrapper.appendChild(document.createTextNode("전체"));
 
-    // URL 파라미터 읽기
+    return wrapper;
+}
+
+// URL 파라미터 읽기
 function getSearchPeriodFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get("searchPeriod");
@@ -97,58 +100,61 @@ function addPastYearButtons(node) {
     }
 }
 
+// 초기 DOM 검사 후 버튼 추가
+document.querySelectorAll('.js-dateperiod').forEach(node => {
+    addPastYearButtons(node);
+});
 
-    // 초기 DOM 검사 후 버튼 추가
-    document.querySelectorAll('.js-dateperiod').forEach(node => {
-        addPastYearButtons(node);
-    });
-
-    // MutationObserver로 동적 추가된 .js-dateperiod에도 버튼 삽입
-    const observerBtn = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1 && node.classList.contains('js-dateperiod')) {
-                    addPastYearButtons(node);
-                }
-            });
+// MutationObserver로 동적 추가된 .js-dateperiod에도 버튼 삽입
+const observerBtn = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1 && node.classList.contains('js-dateperiod')) {
+                addPastYearButtons(node);
+            }
         });
     });
-    observerBtn.observe(document.body, { childList: true, subtree: true });
+});
+observerBtn.observe(document.body, { childList: true, subtree: true });
 
-    // 커스텀 버튼 클릭 이벤트 처리
-    document.addEventListener('click', function(e) {
-        const target = e.target.closest('.custom-range-btn');
-        if (!target) return;
-        e.stopPropagation();
+// 커스텀 버튼 클릭 이벤트 처리
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.custom-range-btn');
+    if (!target) return;
+    e.stopPropagation();
 
-        const input = target.querySelector('input[type="radio"]');
-        if (!input) return;
+    const input = target.querySelector('input[type="radio"]');
+    if (!input) return;
 
-        const container = target.closest('.js-dateperiod');
+    const container = target.closest('.js-dateperiod');
 
-        container.querySelectorAll('.custom-range-btn.active')
-            .forEach(lbl => lbl.classList.remove('active'));
+    // 기존 active 제거
+    container.querySelectorAll('.custom-range-btn.active')
+        .forEach(lbl => lbl.classList.remove('active'));
 
-        target.classList.add('active');
+    // 현재 버튼 활성화
+    target.classList.add('active');
 
-        const startDays = parseInt(input.dataset.rangeStart, 10);
-        const endDays = parseInt(input.dataset.rangeEnd, 10);
-        const $elements = $('input[name*="' + container.dataset.targetName + '"]');
+    const startDays = parseInt(input.dataset.rangeStart, 10);
+    const endDays = parseInt(input.dataset.rangeEnd, 10);
 
-        let $format = "YYYY-MM-DD";
-        try {
-            const picker = $($elements[0]).parent().data('DateTimePicker');
-            if (picker && typeof picker.format === "function") {
-                $format = picker.format();
-            }
-        } catch (err) {
-            console.warn("format 접근 실패, 기본 포맷 사용:", err);
+    const elements = container.querySelectorAll(`input[name*="${container.dataset.targetName}"]`);
+
+    let format = "YYYY-MM-DD";
+    try {
+        const parent = elements[0].parentNode;
+        const picker = parent.DateTimePicker;
+        if (picker && typeof picker.format === "function") {
+            format = picker.format();
         }
+    } catch (err) {
+        console.warn("format 접근 실패, 기본 포맷 사용:", err);
+    }
 
-        const base = momentLib().hours(0).minutes(0).seconds(0);
-        const startDate = base.clone().subtract(startDays, 'days').format($format);
-        const endDate = base.clone().hours(23).minutes(59).seconds(0).subtract(endDays, 'days').format($format);
+    const base = momentLib().hours(0).minutes(0).seconds(0);
+    const startDate = base.clone().subtract(startDays, 'days').format(format);
+    const endDate = base.clone().hours(23).minutes(59).seconds(0).subtract(endDays, 'days').format(format);
 
-        $($elements[0]).val(startDate);
-        $($elements[1]).val(endDate);
-    });
+    elements[0].value = startDate;
+    elements[1].value = endDate;
+});

@@ -30,7 +30,7 @@
         btn.name = "searchPeriod";
 
         const startDays = n * 365;
-        const endDays = (n - 1) * 365;
+        const endDays = (n - 1) * 364;
 
         btn.value = startDays;
         btn.dataset.rangeStart = startDays;

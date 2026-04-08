@@ -29,7 +29,7 @@ function createPastYearButton(n) {
     btn.type = "radio";
     btn.name = "searchPeriod";
 
-    const startDays = n * 364;
+    const startDays = n * 365;
     const endDays = (n - 1) * 365;
 
     btn.value = startDays;

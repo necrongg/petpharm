@@ -1,0 +1,87 @@
+Sub 송장번호일괄등록_v1()
+    Application.ScreenUpdating = False
+
+    Dim wsSrc As Worksheet
+    Set wsSrc = ActiveSheet
+    
+    Dim colMap As Object
+    Set colMap = CreateObject("Scripting.Dictionary")
+    
+    Dim lastCol As Long, i As Long
+    lastCol = wsSrc.Cells(1, wsSrc.Columns.Count).End(xlToLeft).Column
+    
+    For i = 1 To lastCol
+        colMap(wsSrc.Cells(1, i).Value) = i
+    Next i
+    
+    ' 필수 컬럼 체크
+    Dim requiredHeaders As Variant
+    requiredHeaders = Array("운송장번호", "특기사항")
+    
+    Dim H As Variant
+    For Each H In requiredHeaders
+        If Not colMap.exists(H) Then
+            MsgBox "헤더 없음: " & H
+            Exit Sub
+        End If
+    Next H
+    
+    ' 결과 시트
+    Dim wsUpload As Worksheet
+    Set wsUpload = CreateOrClearSheet("송장업로드")
+    
+    ' 헤더 작성
+    Dim headers As Variant
+    headers = Array("번호", "상품주문번호", "주문번호", "배송업체번호", "송장번호", "배송일", "배송완료일")
+    
+    WriteHeaders wsUpload, headers
+    
+    Dim lastRow As Long
+    lastRow = wsSrc.Cells(wsSrc.Rows.Count, 1).End(xlUp).Row
+    
+    Dim nRow As Long: nRow = 2
+    Dim hRow As Long: hRow = 2
+    Dim dRow As Long: dRow = 2
+    
+    For i = 2 To lastRow
+        Dim orderVal, codeVal, WaybillVal, dateVal
+        
+        orderVal = wsSrc.Cells(i, colMap("특기사항")).Value
+        codeVal = "151"
+        WaybillVal = wsSrc.Cells(i, colMap("운송장번호")).Value
+        dateVal = Format(Date, "yyyy-mm-dd")
+
+        WriteRow wsUpload, nRow, "", "", orderVal, codeVal, WaybillVal, dateVal, ""
+        
+        cntTotal = cntTotal + 1
+        nRow = nRow + 1
+        
+ContinueLoop:
+    Next i
+    
+    ' 열 너비 자동
+    wsUpload.Columns.AutoFit
+    
+    ' Excel 저장
+    SaveAsExcel wsUpload, "송장업로드"
+    
+    MsgBox _
+    "총 작업: " & cntTotal & vbCrLf & _
+    "저장 완료"
+    
+    Application.ScreenUpdating = True
+End Sub
+
+ '데이터 1행 작성
+ Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G)
+    ws.Cells(rowNum, 1).Value = a
+    ws.Cells(rowNum, 2).Value = b
+    ws.Cells(rowNum, 3).NumberFormat = "@"
+    ws.Cells(rowNum, 3).Value = c
+    ws.Cells(rowNum, 4).Value = d
+    ws.Cells(rowNum, 5).NumberFormat = "@"
+    ws.Cells(rowNum, 5).Value = e
+    ws.Cells(rowNum, 6).Value = f
+    ws.Cells(rowNum, 7).Value = G
+ End Sub
+

@@ -1,0 +1,153 @@
+Sub 배송데이터정리_v1()
+    Application.ScreenUpdating = False
+
+    Dim wsSrc As Worksheet
+    Set wsSrc = ActiveSheet
+    
+    Dim colMap As Object
+    Set colMap = CreateObject("Scripting.Dictionary")
+    
+    Dim lastCol As Long, i As Long
+    lastCol = wsSrc.Cells(2, wsSrc.Columns.Count).End(xlToLeft).Column
+    
+    For i = 1 To lastCol
+        colMap(wsSrc.Cells(2, i).Value) = i
+    Next i
+    
+    ' 필수 컬럼 체크
+    Dim requiredHeaders As Variant
+    requiredHeaders = Array("받으시는분", "받으시는분전화", "받는분우편번호", "받는분총주소", "품목명", "금액합계", "배송요청사항")
+    
+    Dim H As Variant
+    For Each H In requiredHeaders
+        If Not colMap.exists(H) Then
+            MsgBox "헤더 없음: " & H
+            Exit Sub
+        End If
+    Next H
+    
+    ' 결과 시트
+    Dim wsNormal As Worksheet, wsHigh As Worksheet, wsDirect As Worksheet
+    
+    Set wsNormal = CreateOrClearSheet("일반")
+    Set wsHigh = CreateOrClearSheet("고액")
+    Set wsDirect = CreateOrClearSheet("직배합포장제외")
+    
+    ' 헤더 작성
+    Dim headers As Variant
+    headers = Array("받으시는분", "받으시는분전화", "받는분우편번호", "받는분총주소", "특기사항", "품목명", "운임Type", "내품명")
+    
+    WriteHeaders wsNormal, headers
+    WriteHeaders wsHigh, headers
+    WriteHeaders wsDirect, headers
+    
+    Dim lastRow As Long
+    lastRow = wsSrc.Cells(wsSrc.Rows.Count, 1).End(xlUp).Row
+    
+    Dim nRow As Long: nRow = 2
+    Dim hRow As Long: hRow = 2
+    Dim dRow As Long: dRow = 2
+    
+    Dim amount As Double
+    Dim request As String
+    
+    Dim cntNormal As Long: cntNormal = 0
+    Dim cntHigh As Long: cntHigh = 0
+    Dim cntDirect As Long: cntDirect = 0
+    Dim cntTotal As Long: cntTotal = 0
+    
+    For i = 3 To lastRow
+        ' 마지막 날짜 행 제외
+        If InStr(wsSrc.Cells(i, 1).Value, "202") > 0 And _
+           InStr(wsSrc.Cells(i, 1).Value, ":") > 0 Then
+            GoTo ContinueLoop
+        End If
+        
+        amount = wsSrc.Cells(i, colMap("금액합계")).Value
+        request = wsSrc.Cells(i, colMap("배송요청사항")).Value
+        
+        Dim nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, noteVal
+        
+        nameVal = wsSrc.Cells(i, colMap("받으시는분")).Value
+        phoneVal = FormatPhone(wsSrc.Cells(i, colMap("받으시는분전화")).Value)
+        zipVal = FormatZip(wsSrc.Cells(i, colMap("받는분우편번호")).Value)
+        addrVal = wsSrc.Cells(i, colMap("받는분총주소")).Value
+        specialNotesVal = wsSrc.Cells(i, colMap("특기사항")).Value
+        itemVal = wsSrc.Cells(i, colMap("품목명")).Value    '품목명
+        typeVal = "A"
+        
+        cntTotal = cntTotal + 1
+        
+        ' 직배/합포장 송장입력 제외
+        If InStr(request, "직배") > 0 Or InStr(request, "합포장") > 0 Then
+            WriteRow wsDirect, dRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            dRow = dRow + 1
+            cntDirect = cntDirect + 1
+    
+        ' 금액 50만원 초과
+        ElseIf amount >= 500000 Then
+            ' 금액을 만원 단위로 올림 처리
+            Dim highAmountText As String
+            highAmountText = Application.WorksheetFunction.Ceiling(amount, 10000) / 10000 & "만원"
+            
+            itemVal = itemVal & "/고가품목/" & highAmountText
+            typeVal = "C"
+            
+            WriteRow wsHigh, hRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, amount
+            hRow = hRow + 1
+            cntHigh = cntHigh + 1
+            
+        ' 배송요청사항에 "냉장" 포함
+        ElseIf InStr(request, "냉장") > 0 Then
+            itemVal = itemVal & "/냉장"
+            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            nRow = nRow + 1
+            cntNormal = cntNormal + 1
+    
+        ' 이외 일반
+        Else
+            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            nRow = nRow + 1
+            cntNormal = cntNormal + 1
+        End If
+        
+ContinueLoop:
+    Next i
+    
+    ' 열 너비 자동
+    wsNormal.Columns.AutoFit
+    wsHigh.Columns.AutoFit
+    wsDirect.Columns.AutoFit
+    
+    ' Excel 저장
+    SaveAsExcel wsNormal, "일반"
+    SaveAsExcel wsHigh, "고액"
+    'SaveAsExcel wsDirect, "직배제외" 직배는송장입력이 없으므로 파일을 생성하지 않음
+    
+    MsgBox _
+    "총 작업: " & cntTotal & vbCrLf & _
+    "일반: " & cntNormal & vbCrLf & _
+    "고액: " & cntHigh & vbCrLf & _
+    "직배/합포장 제외: " & cntDirect & vbCrLf & _
+    "저장 완료"
+    
+    Application.ScreenUpdating = True
+End Sub
+
+ '데이터 1행 작성
+ Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G, H, i)
+    ws.Cells(rowNum, 1).Value = a
+    ws.Cells(rowNum, 2).Value = b
+    ws.Cells(rowNum, 3).NumberFormat = "@"
+    ws.Cells(rowNum, 3).Value = c
+    ws.Cells(rowNum, 4).Value = d
+    ws.Cells(rowNum, 5).NumberFormat = "@"
+    ws.Cells(rowNum, 5).Value = e
+    ws.Cells(rowNum, 6).Value = f
+    ws.Cells(rowNum, 7).Value = G
+    ws.Cells(rowNum, 8).Value = H
+    ws.Cells(rowNum, 9).NumberFormat = "#,##0"
+    ws.Cells(rowNum, 9).Value = i
+ End Sub
+ 
+

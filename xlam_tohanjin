@@ -35,7 +35,7 @@ Sub 배송데이터정리_v1()
     
     ' 헤더 작성
     Dim headers As Variant
-    headers = Array("받으시는분", "받으시는분전화", "받는분우편번호", "받는분총주소", "특기사항", "품목명", "운임Type", "내품명")
+    headers = Array("받으시는분", "받으시는분전화", "받는분우편번호", "받는분총주소", "주문번호", "품목명", "운임Type", "내품명", "특이사항", "금액")
     
     WriteHeaders wsNormal, headers
     WriteHeaders wsHigh, headers
@@ -66,47 +66,70 @@ Sub 배송데이터정리_v1()
         amount = wsSrc.Cells(i, colMap("금액합계")).Value
         request = wsSrc.Cells(i, colMap("배송요청사항")).Value
         
-        Dim nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, noteVal
+        Dim nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, noteVal, itemVal2
         
         nameVal = wsSrc.Cells(i, colMap("받으시는분")).Value
         phoneVal = FormatPhone(wsSrc.Cells(i, colMap("받으시는분전화")).Value)
         zipVal = FormatZip(wsSrc.Cells(i, colMap("받는분우편번호")).Value)
         addrVal = wsSrc.Cells(i, colMap("받는분총주소")).Value
         specialNotesVal = wsSrc.Cells(i, colMap("특기사항")).Value
-        itemVal = wsSrc.Cells(i, colMap("품목명")).Value    '품목명
+        itemVal = wsSrc.Cells(i, colMap("품목명")).Value
+        itemVal2 = wsSrc.Cells(i, colMap("약품명")).Value
         typeVal = "A"
         
         cntTotal = cntTotal + 1
         
+        Dim highAmountText As String
+        
         ' 직배/합포장 송장입력 제외
         If InStr(request, "직배") > 0 Or InStr(request, "합포장") > 0 Then
-            WriteRow wsDirect, dRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            WriteRow wsDirect, dRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request, ""
             dRow = dRow + 1
             cntDirect = cntDirect + 1
     
-        ' 금액 50만원 초과
+        ' 세트 구별 / 의약품 세트만!
+        ElseIf InStr(itemVal2, "의약품Set") > 0 Then
+            Dim rawItemVal As String
+            rawItemVal = itemVal
+
+            highAmountText = Application.WorksheetFunction.Ceiling(amount, 10000) / 10000 & "만원"
+            itemVal = itemVal & "/고가품목/" & highAmountText
+            typeVal = "C"
+            
+            WriteRow wsHigh, hRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request, amount
+            hRow = hRow + 1
+        
+            itemVal = rawItemVal & "/진열대"
+            typeVal = "D"
+            
+            WriteRow wsHigh, hRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, "", ""
+            hRow = hRow + 1
+
+            cntHigh = cntHigh + 1
+                
+        ' 금액 50만원 이상
         ElseIf amount >= 500000 Then
             ' 금액을 만원 단위로 올림 처리
-            Dim highAmountText As String
             highAmountText = Application.WorksheetFunction.Ceiling(amount, 10000) / 10000 & "만원"
             
             itemVal = itemVal & "/고가품목/" & highAmountText
             typeVal = "C"
             
-            WriteRow wsHigh, hRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, amount
+            WriteRow wsHigh, hRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request, amount
+            
             hRow = hRow + 1
             cntHigh = cntHigh + 1
             
         ' 배송요청사항에 "냉장" 포함
         ElseIf InStr(request, "냉장") > 0 Then
             itemVal = itemVal & "/냉장"
-            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request, ""
             nRow = nRow + 1
             cntNormal = cntNormal + 1
     
         ' 이외 일반
         Else
-            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request
+            WriteRow wsNormal, nRow, nameVal, phoneVal, zipVal, addrVal, specialNotesVal, itemVal, typeVal, itemVal, request, ""
             nRow = nRow + 1
             cntNormal = cntNormal + 1
         End If
@@ -118,6 +141,24 @@ ContinueLoop:
     wsNormal.Columns.AutoFit
     wsHigh.Columns.AutoFit
     wsDirect.Columns.AutoFit
+    
+    ' d열과 i열은 최대 너비 60으로 제한
+    With wsNormal
+        If .Columns("D").ColumnWidth > 60 Then .Columns("D").ColumnWidth = 60
+        If .Columns("I").ColumnWidth > 60 Then .Columns("I").ColumnWidth = 60
+    End With
+    
+    With wsHigh
+        If .Columns("D").ColumnWidth > 60 Then .Columns("D").ColumnWidth = 60
+        If .Columns("I").ColumnWidth > 60 Then .Columns("I").ColumnWidth = 60
+    End With
+    
+    With wsDirect
+        If .Columns("D").ColumnWidth > 60 Then .Columns("D").ColumnWidth = 60
+        If .Columns("I").ColumnWidth > 60 Then .Columns("I").ColumnWidth = 60
+    End With
+
+
     
     ' Excel 저장
     SaveAsExcel wsNormal, "일반"
@@ -135,7 +176,7 @@ ContinueLoop:
 End Sub
 
  '데이터 1행 작성
- Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G, H, i)
+ Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G, H, i, J)
     ws.Cells(rowNum, 1).Value = a
     ws.Cells(rowNum, 2).Value = b
     ws.Cells(rowNum, 3).NumberFormat = "@"
@@ -146,8 +187,10 @@ End Sub
     ws.Cells(rowNum, 6).Value = f
     ws.Cells(rowNum, 7).Value = G
     ws.Cells(rowNum, 8).Value = H
-    ws.Cells(rowNum, 9).NumberFormat = "#,##0"
     ws.Cells(rowNum, 9).Value = i
+    ws.Cells(rowNum, 10).NumberFormat = "#,##0"
+    ws.Cells(rowNum, 10).Value = J
+
  End Sub
  
 

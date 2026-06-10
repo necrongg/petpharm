@@ -1,15 +1,16 @@
 // ==UserScript==
-// @name         petPharmAddon
+// @name         petPharmAddon_v2
 // @namespace    -
 // @version      2026.04.02
 // @description  2~1년, 3~2년, 4~3년, 5~4년 버튼 추가
-// @match        http://gdadmin.petpharm.co.kr/share/*
+// @match        http://gdadmin.petpharm.co.kr/share/member_crm_order.php*
 // @grant        none
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
 // ==/UserScript==
 
 (function () {
+
     'use strict';
 
     const baseUrl = 'https://raw.githubusercontent.com/necrongg/petpharm/refs/heads/main/';
@@ -17,8 +18,8 @@
     const defaultScripts = ['css.css', 'commonSettings.js'];
     const scriptsToLoad = savedScripts ? JSON.parse(savedScripts) : defaultScripts;
 
-    // TTL: 캐시 재요청 간격 (1시간 * 9)
-    const CACHE_TTL = 1000 * 60 * 60 * 9;
+    // TTL: 캐시 재요청 간격 (1시간 * 1)
+    const CACHE_TTL = 1000 * 60 * 60 * 1;
 
     // 안전한 ID 문자열 생성
     function idSafe(name) {
@@ -121,7 +122,6 @@
             }, 3000);
         });
 
-        // MutationObserver 생성
         const observer = new MutationObserver((mutations, obs) => {
             const target = document.querySelector('#ext-element-2');
             if (target) {

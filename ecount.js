@@ -4,11 +4,12 @@ document.addEventListener('keydown', function (e) {
             const sendSellBtn = document.getElementById('sendSell');
 
             if (transmitBtn) {
+                //ERP판매 팝업속 (확인)
                 transmitBtn.click();
-                console.log('▶️ 전송 버튼 클릭됨');
+                
             } else if (sendSellBtn) {
+                //ERP판매
                 sendSellBtn.click();
-                console.log('▶️ ERP전송(판매) 버튼 클릭됨');
             } else {
                 console.error('❌ 전송 버튼과 ERP전송 버튼 모두 없음');
             }

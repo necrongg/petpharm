@@ -28,6 +28,9 @@ document.addEventListener('keydown', function (e) {
 
                     // 첫 번째 주문자 값 사용
                     const valueToInsert = customers[0] || '';
+                    if (!valueToInsert) {
+                        console.warn('⚠️ 주문자 값이 비어있습니다.');
+                    }
 
                     // MutationObserver로 data-cid="cust" 감지 (최대 10초)
                     const observer = new MutationObserver((mutations, obs) => {

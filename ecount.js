@@ -2,19 +2,20 @@ document.addEventListener('keydown', function (e) {
         if (e.key === 'F2') {
             const transmitBtn = document.getElementById('transmit');
             const sendSellBtn = document.getElementById('sendSell');
-
+                
+        ' ERP전송(판매) 버튼
             if (transmitBtn) {
                 transmitBtn.click();
-
+        ' 확인 버튼
             } else if (sendSellBtn) {
                 let checkedRows = Array.from(document.querySelectorAll('tr'))
                 .filter(tr => tr.querySelector('input[type="checkbox"][checked="checked"]'));
-
+        '주소
                 let addresses = checkedRows.map(tr => {
                     const addressCell = tr.querySelector('td[data-label="주소"] span');
                     return addressCell ? addressCell.textContent.trim() : null;
                 });
-
+        '주문자
                 let customers = checkedRows.map(tr => {
                     const customerCell = tr.querySelector('td[data-label="주문자"] span');
                     return customerCell ? customerCell.textContent.trim() : null;

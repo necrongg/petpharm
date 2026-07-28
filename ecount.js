@@ -58,7 +58,6 @@
                         const custInput = document.querySelector('input[data-cid="cust"]');
                         const empInput = document.querySelector('input[data-cid="emp_cd"]');
                         if (custInput && empInput) {
-                            console.log(valueToInsert,empValue,firstAddress)
                             empInput.value = empValue; // 담당자 값 입력
                             custInput.value = valueToInsert; // 주문자 값 입력
 

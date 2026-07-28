@@ -1,4 +1,18 @@
-// 키보드 이벤트 리스너 등록
+// ==UserScript==
+// @name         petPharmAddon_ecount_test
+// @namespace    -
+// @version      1
+// @description  1
+// @match        https://logincc.ecount.com/ec5/view/erp?*
+// @grant        none
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
+// ==/UserScript==
+
+(function () {
+    'use strict';
+
+    // 키보드 이벤트 리스너 등록
     document.addEventListener('keydown', function (e) {
         // F2 키가 눌렸을 때만 실행
         if (e.key === 'F2') {
@@ -53,7 +67,7 @@
                 //console.log("✅ allAddressSame:", allAddressSame);
                 //console.log("✅ allCustomerSame:", allCustomerSame);
 
-                // 주소와 주문자가 모두 동일할 경우 → 바로 실행
+                // 주소와 주문자가 모두 동일할 경우
                 if (allAddressSame && allCustomerSame) {
                     // 판매 전송 버튼 클릭
                     sendSellBtn.click();
@@ -82,7 +96,7 @@
                         console.warn('⏱️ 거래처/담당자 입력 대기 시간 초과');
                     }, 5000);
                 }
-                // 주소 또는 주문자가 다를 경우 → 확인창 띄우고, 확인 시 동일 로직 실행
+                // 주소 또는 주문자가 다를 경우
                 else {
                     const proceed = confirm('선택된 주소 또는 주문자가 2건 이상입니다. 진행하시겠습니까?');
                     if (proceed) {
@@ -92,3 +106,7 @@
                 }
             }
         }
+    });
+
+
+})();

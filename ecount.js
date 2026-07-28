@@ -1,18 +1,4 @@
-// ==UserScript==
-// @name         petPharmAddon_ecount_test
-// @namespace    -
-// @version      1
-// @description  1
-// @match        https://logincc.ecount.com/ec5/view/erp?*
-// @grant        none
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
-// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
-// ==/UserScript==
-
-(function () {
-    'use strict';
-
-    // 키보드 이벤트 리스너 등록
+// 키보드 이벤트 리스너 등록
     document.addEventListener('keydown', function (e) {
         // F2 키가 눌렸을 때만 실행
         if (e.key === 'F2') {
@@ -107,6 +93,3 @@
             }
         }
     });
-
-
-})();

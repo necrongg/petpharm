@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         petPharmAddon_ecount
+// @name         petPharmAddon_ecount_test
 // @namespace    -
-// @version      1
-// @description  1
+// @version      2026.07.28
+// @description  주문수집 애드온
 // @match        https://logincc.ecount.com/ec5/view/erp?*
 // @grant        none
 // @require      https://code.jquery.com/jquery-3.6.0.min.js

@@ -64,11 +64,25 @@
                     // 마지막 주소 값 사용
                     const firstAddress = addresses[addresses.length - 1] || '';
 
-                    // MutationObserver로 거래처 입력칸(data-cid="cust")와 담당자 입력칸(data-cid="emp_cd") 감지
-                    const observer = new MutationObserver((mutations, obs) => {
-                        const custInput = document.querySelector('input[data-cid="cust"]');
+                    // 주소 -> 담당자 매핑
+                    let empValue = '';
+                    if (/서울|강원|인천/.test(firstAddress)) {
+                        empValue = '고일재';
+                    } else if (/경기도|충청|대전|세종/.test(firstAddress)) {
+                        empValue = '임문희';
+                    } else{
+                        empValue = '김철현';
+                    }
 
-                        if (custInput) {
+                    // 거래처 입력칸(data-cid="cust")와 담당자 입력칸(data-cid="emp_cd") 감지
+                    const observer = new MutationObserver((mutations, obs) => {
+                        // 주문자명 값 찾기
+                        const custInput = document.querySelector('input[data-cid="cust"]');
+                        //담당자 값 찾기
+                        const empInput = document.querySelector('input[data-cid="emp_cd"]');
+
+                        if (custInput && empInput) {
+                            empInput.value = empValue; // 담당자 값 입력
                             custInput.value = valueToInsert; // 주문자 값 입력
 
                             obs.disconnect(); // 감지 중단

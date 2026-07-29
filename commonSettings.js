@@ -103,7 +103,6 @@ document.querySelectorAll('.js-dateperiod').forEach(node => {
     addPastYearButtons(node);
 });
 
-// MutationObserver로 동적 추가된 .js-dateperiod에도 버튼 삽입
 const observerBtn = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
@@ -115,7 +114,7 @@ const observerBtn = new MutationObserver((mutations) => {
 });
 observerBtn.observe(document.body, { childList: true, subtree: true });
 
-// 커스텀 버튼 클릭 이벤트 처리
+// 클릭 이벤트 처리
 document.addEventListener('click', function(e) {
     const target = e.target.closest('.custom-range-btn');
     if (!target) return;

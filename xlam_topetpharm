@@ -1,87 +1,71 @@
-Sub 송장번호일괄등록_v1()
-    Application.ScreenUpdating = False
+Sub 송장번호일괄등록_v2()
+    Application.ScreenUpdating = False ' 화면 깜빡임 방지
 
     Dim wsSrc As Worksheet
-    Set wsSrc = ActiveSheet
+    Set wsSrc = ActiveSheet ' 현재 활성 시트를 원본 데이터 시트로 설정
     
-    Dim colMap As Object
-    Set colMap = CreateObject("Scripting.Dictionary")
-    
-    Dim lastCol As Long, i As Long
-    lastCol = wsSrc.Cells(1, wsSrc.Columns.Count).End(xlToLeft).Column
-    
-    For i = 1 To lastCol
-        colMap(wsSrc.Cells(1, i).Value) = i
-    Next i
-    
-    ' 필수 컬럼 체크
-    Dim requiredHeaders As Variant
-    requiredHeaders = Array("운송장번호", "특기사항")
-    
-    Dim H As Variant
-    For Each H In requiredHeaders
-        If Not colMap.exists(H) Then
-            MsgBox "헤더 없음: " & H
-            Exit Sub
-        End If
-    Next H
-    
-    ' 결과 시트
+    ' 결과 저장용 시트 생성/초기화
     Dim wsUpload As Worksheet
     Set wsUpload = CreateOrClearSheet("송장업로드")
     
-    ' 헤더 작성
+    ' 결과 시트 헤더 작성
     Dim headers As Variant
     headers = Array("번호", "상품주문번호", "주문번호", "배송업체번호", "송장번호", "배송일", "배송완료일")
-    
     WriteHeaders wsUpload, headers
     
-    Dim lastRow As Long
-    lastRow = wsSrc.Cells(wsSrc.Rows.Count, 1).End(xlUp).Row
+    ' 원본 데이터 마지막 행 찾기
+    Dim LastRow As Long
+    LastRow = wsSrc.Cells(wsSrc.Rows.Count, 1).End(xlUp).Row
     
+    ' 결과 시트 행 번호 초기화
     Dim nRow As Long: nRow = 2
-    Dim hRow As Long: hRow = 2
-    Dim dRow As Long: dRow = 2
+    Dim cntTotal As Long: cntTotal = 0
     
-    For i = 2 To lastRow
-        Dim orderVal, codeVal, WaybillVal, dateVal
+    ' 데이터 행 반복 처리 (3행부터 시작)
+    For i = 3 To LastRow
+        Dim orderVal As String, codeVal As String, WaybillVal As String, dateVal As String
         
-        orderVal = wsSrc.Cells(i, colMap("특기사항")).Value
+        ' 출고번호 = E열
+        orderVal = wsSrc.Cells(i, 5).Value
+        
+        ' 배송업체번호 = 고정값 "151"
         codeVal = "151"
-        WaybillVal = wsSrc.Cells(i, colMap("운송장번호")).Value
+        
+        ' 운송장번호 = A열
+        WaybillVal = wsSrc.Cells(i, 1).Value
+        
+        ' 배송일 = 오늘 날짜 (yyyy-mm-dd 형식)
         dateVal = Format(Date, "yyyy-mm-dd")
-
+        
+        ' 결과 시트에 행 작성
         WriteRow wsUpload, nRow, "", "", orderVal, codeVal, WaybillVal, dateVal, ""
         
         cntTotal = cntTotal + 1
         nRow = nRow + 1
-        
-ContinueLoop:
     Next i
     
-    ' 열 너비 자동
+    ' 열 너비 자동 조정
     wsUpload.Columns.AutoFit
     
-    ' Excel 저장
+    ' 결과 시트 저장
     SaveAsExcel wsUpload, "송장업로드"
     
-    MsgBox _
-    "총 작업: " & cntTotal & vbCrLf & _
-    "저장 완료"
+    ' 완료 메시지 출력
+    MsgBox "총 작업: " & cntTotal & vbCrLf & "파일 저장 완료"
     
     Application.ScreenUpdating = True
 End Sub
 
- '데이터 1행 작성
- Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G)
-    ws.Cells(rowNum, 1).Value = a
-    ws.Cells(rowNum, 2).Value = b
-    ws.Cells(rowNum, 3).NumberFormat = "@"
+' 행 단위 데이터 작성 함수
+Sub WriteRow(ws As Worksheet, rowNum As Long, a, b, c, d, e, f, G)
+    ws.Cells(rowNum, 1).Value = a          ' 번호
+    ws.Cells(rowNum, 2).Value = b          ' 상품주문번호
+    ws.Cells(rowNum, 3).NumberFormat = "@" ' 주문번호 (문자열 형식)
     ws.Cells(rowNum, 3).Value = c
-    ws.Cells(rowNum, 4).Value = d
-    ws.Cells(rowNum, 5).NumberFormat = "@"
+    ws.Cells(rowNum, 4).Value = d          ' 배송업체번호
+    ws.Cells(rowNum, 5).NumberFormat = "@" ' 송장번호 (문자열 형식)
     ws.Cells(rowNum, 5).Value = e
-    ws.Cells(rowNum, 6).Value = f
-    ws.Cells(rowNum, 7).Value = G
- End Sub
+    ws.Cells(rowNum, 6).Value = f          ' 배송일
+    ws.Cells(rowNum, 7).Value = G          ' 배송완료일
+End Sub
 

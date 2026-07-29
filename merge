@@ -1,0 +1,105 @@
+Sub 매크로실행_송장종합()
+
+    Dim fd As FileDialog
+    Dim FileChosen As Integer
+    Dim FileName As Variant
+    Dim wbSource As Workbook
+    Dim wsSource As Worksheet
+    Dim wbDest As Workbook
+    Dim wsDest As Worksheet
+    Dim LastRow As Long
+    Dim PasteRow As Long
+    Dim HeaderCopied As Boolean
+    Dim NewFileName As String
+    Dim DesktopPath As String
+    Dim KeepCols As Variant
+    Dim i As Long
+    
+    ' 화면 업데이트 중지
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+    
+    ' 현재 사용자 바탕화면 경로 자동 가져오기
+    DesktopPath = Environ("USERPROFILE") & "\Desktop\"
+    
+    ' (OneDrive Desktop 자동 인식)
+    If Dir(Environ("OneDrive") & "\Desktop\", vbDirectory) <> "" Then
+        DesktopPath = Environ("OneDrive") & "\Desktop\"
+    End If
+    
+    ' 파일 선택창 열기
+    Set fd = Application.FileDialog(msoFileDialogFilePicker)
+    fd.AllowMultiSelect = True
+    fd.Filters.Clear
+    fd.Filters.Add "Excel Files", "*.xls; *.xlsx; *.xlsm"
+    
+    FileChosen = fd.Show
+    If FileChosen <> -1 Then
+        MsgBox "취소"
+        GoTo CleanExit
+    End If
+    
+    ' 새 파일 생성
+    NewFileName = Format(Now, "yymmddhhmm") & " 송장종합.xlsx"
+    Set wbDest = Workbooks.Add
+    Set wsDest = wbDest.Sheets(1)
+    wsDest.name = "송장종합"
+    PasteRow = 1
+    HeaderCopied = False
+    
+    ' 선택된 파일들 반복
+    For Each FileName In fd.SelectedItems
+        Set wbSource = Workbooks.Open(FileName, ReadOnly:=True)
+        Set wsSource = wbSource.Sheets(1)
+        
+        ' 마지막 행 찾기
+        LastRow = wsSource.Cells(wsSource.Rows.Count, 1).End(xlUp).Row
+        
+    ' 헤더 복사 (첫 번째 파일만, 1~2행 모두)
+    If Not HeaderCopied Then
+        wsSource.Rows("1:2").Copy wsDest.Rows(PasteRow)
+        PasteRow = PasteRow + 2   ' 헤더가 2줄이므로 붙여넣은 후 2줄 건너뜀
+        HeaderCopied = True
+    End If
+    
+    ' 데이터 복사 (3행부터)
+    If LastRow > 2 Then
+        wsSource.Range("A3:A" & LastRow).EntireRow.Copy wsDest.Rows(PasteRow)
+        PasteRow = wsDest.Cells(wsDest.Rows.Count, 1).End(xlUp).Row + 1
+    End If
+        
+        wbSource.Close SaveChanges:=False
+    Next FileName
+        
+    ' 필요한 열만 남기기: D, T, Z, AG, AI, AK, AQ
+    ' D=4, T=20, Z=26, AG=33, AI=35, AK=37, AQ=43
+    KeepCols = Array(4, 20, 26, 33, 35, 37, 43)
+    
+    For i = wsDest.Cells(1, wsDest.Columns.Count).End(xlToLeft).Column To 1 Step -1
+        If IsError(Application.Match(i, KeepCols, 0)) Then
+            wsDest.Columns(i).Delete
+        End If
+    Next i
+    
+    ' G열 이름 변경
+    wsDest.Cells(1, 7).Value = "내품가"
+    
+    ' A:G 열 자동 너비 조정
+    wsDest.Columns("A:G").AutoFit
+    
+    ' 송장번호 업로드용 매크로 실행
+    Call 송장번호일괄등록_v2
+    
+    wsDest.Activate
+    
+    ' 바탕화면에 저장
+    wbDest.SaveAs DesktopPath & NewFileName
+    MsgBox "송장 종합 파일이 바탕화면에 생성되었습니다: " & DesktopPath & NewFileName
+    
+CleanExit:
+    ' 화면 업데이트 활성화
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+    
+End Sub
+

@@ -9,7 +9,7 @@
             if (transmitBtn) {
                 transmitBtn.click();
             }
-            // ERP 전송 버튼이 없고 판매 전송 버튼이 있을 경우
+            // 판매 전송 버튼이 있을 경우
             else if (sendSellBtn) {
                 // 체크된 행(tr)만 필터링
                 let checkedRows = Array.from(document.querySelectorAll('tr'))

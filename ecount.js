@@ -2,14 +2,14 @@
     document.addEventListener('keydown', function (e) {
         // F2 키가 눌렸을 때만 실행
         if (e.key === 'F2') {
-            const transmitBtn = document.getElementById('transmit');// ERP 전송 버튼
-            const sendSellBtn = document.getElementById('sendSell');// 판매 전송 버튼
+            const sendSellBtn = document.getElementById('sendSell');// ERP전송(판매) 버튼
+            const transmitBtn = document.getElementById('transmit');// 전송 버튼
 
-            // ERP 전송 버튼이 있으면 클릭
+            // 전송 버튼이 있으면 클릭
             if (transmitBtn) {
                 transmitBtn.click();
             }
-            // 판매 전송 버튼이 있을 경우
+            // ERP전송(판매) 버튼이 있을 경우
             else if (sendSellBtn) {
                 // 체크된 행(tr)만 필터링
                 let checkedRows = Array.from(document.querySelectorAll('tr'))
@@ -105,6 +105,7 @@
                         console.warn('⏱️ 거래처/담당자 입력 대기 시간 초과');
                     }, 5000);
                 }
+
                 // 주소 또는 주문자가 다를 경우
                 else {
                     const proceed = confirm('선택된 주소 또는 주문자가 2건 이상입니다. 진행하시겠습니까?');

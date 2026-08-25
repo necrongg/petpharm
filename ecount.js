@@ -58,9 +58,6 @@
                     // 판매 전송 버튼 클릭
                     sendSellBtn.click();
 
-                    // 마지막 주문자 값 사용
-                    const valueToInsert = customers[customers.length - 1] || '';
-
                     // 마지막 주소 값 사용
                     const firstAddress = addresses[addresses.length - 1] || '';
 
@@ -72,6 +69,18 @@
                         empValue = '임문희';
                     } else{
                         empValue = '김철현';
+                    }
+
+                    // 고정 직배 이름 목록 배열
+                    // 주문자명
+                    const names = ['곽정근', '정계은', '이민기', '최우진', '정두선', '정지원'];
+
+                    // 마지막 주문자 값 사용
+                    const valueToInsert = customers[customers.length - 1] || '';
+
+                    // 목록에 포함되어 있으면 알림창 표시
+                    if (names.includes(valueToInsert)){
+                        alert("고정직배 확인");
                     }
 
                     // 거래처 입력칸(data-cid="cust")와 담당자 입력칸(data-cid="emp_cd") 감지

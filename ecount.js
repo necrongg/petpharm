@@ -58,6 +58,8 @@
                     // 판매 전송 버튼 클릭
                     sendSellBtn.click();
 
+                    // 마지막 주문자 값 사용
+                    const valueToInsert = customers[customers.length - 1] || '';
                     // 마지막 주소 값 사용
                     const firstAddress = addresses[addresses.length - 1] || '';
 
@@ -74,9 +76,6 @@
                     // 고정 직배 이름 목록 배열
                     // 주문자명
                     const names = ['곽정근', '정계은', '이민기', '최우진', '정두선', '정지원'];
-
-                    // 마지막 주문자 값 사용
-                    const valueToInsert = customers[customers.length - 1] || '';
 
                     // 목록에 포함되어 있으면 알림창 표시
                     if (names.includes(valueToInsert)){

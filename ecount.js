@@ -27,8 +27,16 @@
                     return customerCell ? customerCell.textContent.trim() : null;
                 });
 
-                //console.log("✅ addresses:", addresses);
-                //console.log("✅ customers:", customers);
+                // 품목명 값 추출
+                let items = checkedRows.map(tr => {
+                    const customerCell = tr.querySelector('td[data-label="품목명(ERP_ECOUNT)"] span');
+                    return customerCell ? customerCell.textContent.trim() : null;
+                });
+
+                console.log("✅ addresses:", addresses);
+                console.log("✅ customers:", customers);
+                console.log("✅ items:", items,items.length);
+
 
                 // 주소 동일성 체크 (첫 번째 null은 무시) / 전체 선택시 첫 번째 열값 null
                 let allAddressSame = true;
@@ -76,10 +84,17 @@
                     // 고정 직배 이름 목록 배열
                     // 주문자명
                     const names = ['곽정근', '정계은', '이민기', '최우진', '정두선', '정지원'];
-
                     // 목록에 포함되어 있으면 알림창 표시
                     if (names.includes(valueToInsert)){
                         alert("고정직배 확인");
+                    }
+
+                    // 품목필터 목록 배열
+                    // 주문자명
+                    const itemFilter = ['(냉)'];
+                    // 목록에 포함되어 있으면 알림창 표시
+                    if (items.length >= 2 && items.some(item => itemFilter.some(filter => item.includes(filter)))) {
+                        alert("냉장 제품이 포함되어 있습니다.");
                     }
 
                     // 거래처 입력칸(data-cid="cust")와 담당자 입력칸(data-cid="emp_cd") 감지

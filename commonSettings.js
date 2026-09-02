@@ -189,7 +189,7 @@
                 <button type="button" id="btn-show-target" class="btn btn-sm" style="background:#d9534f; color:#fff; border:none;">해당 내역만 보기</button>
                 <button type="button" id="btn-hide-target" class="btn btn-sm" style="background:#f0ad4e; color:#fff; border:none;">해당 내역 숨기기</button>
             </div>`;
-            $('.table-rows').before(filterHtml);
+            $('.table-rows').first().before(filterHtml);
         }
 
         function toggleRows(mode) {

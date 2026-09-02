@@ -93,7 +93,10 @@
                     // 주문자명
                     const itemFilter = ['(냉)'];
                     // 목록에 포함되어 있으면 알림창 표시
-                    if (items.length >= 2 && items.some(item => itemFilter.some(filter => item.includes(filter)))) {
+                    if (
+                        items.length >= 2 &&
+                        items.some(item => item && itemFilter.some(filter => item.includes(filter)))
+                    ) {
                         alert("냉장 제품이 포함되어 있습니다.");
                     }
 

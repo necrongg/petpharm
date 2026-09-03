@@ -160,7 +160,7 @@
         let currentOrderId = '';
         let targetOrders = new Set();
 
-        // 필터링할 타겟 상태값들 (여기에 원하는 상태를 계속 추가할 수 있습니다)
+        // 필터링할 타겟 상태값들
         const targetStatuses = ['결제실패', '고객결제중단', '환불완료', '환불접수'];
 
         $('.table-rows tbody tr').each(function() {

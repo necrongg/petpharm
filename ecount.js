@@ -33,10 +33,9 @@
                     return customerCell ? customerCell.textContent.trim() : null;
                 });
 
-                console.log("✅ addresses:", addresses);
-                console.log("✅ customers:", customers);
-                console.log("✅ items:", items,items.length);
-
+                //console.log("✅ addresses:", addresses);
+                //console.log("✅ customers:", customers);
+                //console.log("✅ items:", items,items.length);
 
                 // 주소 동일성 체크 (첫 번째 null은 무시) / 전체 선택시 첫 번째 열값 null
                 let allAddressSame = true;

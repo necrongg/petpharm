@@ -141,6 +141,10 @@ function highlightAmtCells(node) {
         const amtValue = parseInt(span.textContent.replace(/,/g, ''), 10);
         if (amtValue >= 500000) {
             span.style.backgroundColor = 'yellow';
+            span.style.fontWeight = 'bold';
+        } else if (amtValue === 0)  {
+            span.style.backgroundColor = 'red';
+            span.style.fontWeight = 'bold';
         } else {
             span.style.backgroundColor = '';
         }

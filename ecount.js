@@ -139,7 +139,7 @@ function highlightAmtCells(node) {
     const amtSpans = node.querySelectorAll('[data-item-key="amt_salesXlist"]');
     amtSpans.forEach(span => {
         const amtValue = parseInt(span.textContent.replace(/,/g, ''), 10);
-        if (amtValue >= 500000) {
+        if (amtValue > 500000) {
             span.style.backgroundColor = 'yellow';
             span.style.fontWeight = 'bold';
         } else if (amtValue === 0)  {
@@ -150,13 +150,6 @@ function highlightAmtCells(node) {
         }
     });
 }
-
-document.querySelectorAll('[data-item-key="amt_salesXlist"]').forEach(span => {
-    const amtValue = parseInt(span.textContent.replace(/,/g, ''), 10);
-    if (amtValue > 500000) {
-        span.style.backgroundColor = 'yellow';
-    }
-});
 
 const observerAmt = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {

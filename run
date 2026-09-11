@@ -4,7 +4,8 @@
 // @version      2026.09.11
 // @description  2~1년, 3~2년, 4~3년, 5~4년 버튼 추가
 // @match        http://gdadmin.petpharm.co.kr/share/*
-// @grant        unsafeWindow
+// @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
 // ==/UserScript==
 
 (function () {

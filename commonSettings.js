@@ -1,6 +1,6 @@
 // Tampermonkey 전용 네임스페이스
-const tm$ = unsafeWindow.jQuery;
-const momentLib = unsafeWindow.moment;
+const tm$ = window.jQuery;
+const momentLib = window.moment;
 
 // DateTimePicker 주입
 function injectSafeDateTimePicker() {

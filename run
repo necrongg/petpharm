@@ -1,16 +1,13 @@
 // ==UserScript==
-// @name         petPharmAddon_v2
+// @name         petPharmAddon_godomall
 // @namespace    -
-// @version      2026.04.02
+// @version      2026.09.11
 // @description  2~1년, 3~2년, 4~3년, 5~4년 버튼 추가
-// @match        http://gdadmin.petpharm.co.kr/share/member_crm_order.php*
-// @grant        none
-// @require      https://code.jquery.com/jquery-3.6.0.min.js
-// @require      https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js
+// @match        http://gdadmin.petpharm.co.kr/share/*
+// @grant        unsafeWindow
 // ==/UserScript==
 
 (function () {
-
     'use strict';
 
     const baseUrl = 'https://raw.githubusercontent.com/necrongg/petpharm/refs/heads/main/';

@@ -4,24 +4,27 @@ const momentLib = window.moment;
 
 // DateTimePicker 주입
 function injectSafeDateTimePicker() {
-    tm$('.js-dateperiod').each(function() {
+    tm$('.js-dateperiod').each(function () {
         const $elements = tm$('input[name*="' + tm$(this).data('target-name') + '"]');
         if ($elements.length > 0) {
             const parent = tm$($elements[0]).parent();
             let picker = parent.data('DateTimePicker');
             if (!picker || typeof picker.format !== "function") {
                 parent.data('DateTimePicker', {
-                    format: function() { return "YYYY-MM-DD"; }
+                    format: function () {
+                        return "YYYY-MM-DD";
+                    }
                 });
             }
         }
     });
 }
+
 injectSafeDateTimePicker();
 
 const observerSafe = new MutationObserver(() => injectSafeDateTimePicker());
 
-observerSafe.observe(document.body, { childList: true, subtree: true });
+observerSafe.observe(document.body, {childList: true, subtree: true});
 
 // 커스텀 버튼 생성 함수 (n년~(n-1)년)
 function createPastYearButton(n) {
@@ -40,7 +43,7 @@ function createPastYearButton(n) {
     btn.dataset.rangeEnd = endDays;
 
     wrapper.appendChild(btn);
-    wrapper.appendChild(document.createTextNode(`${n}년~${n-1}년`));
+    wrapper.appendChild(document.createTextNode(`${n}년~${n - 1}년`));
 
     return wrapper;
 }
@@ -113,10 +116,10 @@ const observerBtn = new MutationObserver((mutations) => {
         });
     });
 });
-observerBtn.observe(document.body, { childList: true, subtree: true });
+observerBtn.observe(document.body, {childList: true, subtree: true});
 
 // 클릭 이벤트 처리
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     const target = e.target.closest('.custom-range-btn');
     if (!target) return;
     e.stopPropagation();
@@ -154,13 +157,13 @@ document.addEventListener('click', function(e) {
 });
 
 // 결제 실패, 결제 중단, 환불 등 숨기기 버튼
-(function($) {
+(function ($) {
     let currentOrderId = '';
     let targetOrders = new Set();
 
     const targetStatuses = ['결제실패', '고객결제중단', '환불완료', '환불접수'];
 
-    tm$('.table-rows tbody tr').each(function() {
+    tm$('.table-rows tbody tr').each(function () {
         let $tds = tm$(this).children('td');
 
         if ($tds.length >= 10) {
@@ -189,7 +192,7 @@ document.addEventListener('click', function(e) {
     }
 
     function toggleRows(mode) {
-        tm$('.table-rows tbody tr').each(function() {
+        tm$('.table-rows tbody tr').each(function () {
             let orderId = tm$(this).attr('data-order-id');
             let isTargetOrder = targetOrders.has(orderId);
 
@@ -203,8 +206,14 @@ document.addEventListener('click', function(e) {
         });
     }
 
-    tm$('#btn-show-all').on('click', function() { toggleRows('all'); });
-    tm$('#btn-show-target').on('click', function() { toggleRows('only-target'); });
-    tm$('#btn-hide-target').on('click', function() { toggleRows('hide-target'); });
+    tm$('#btn-show-all').on('click', function () {
+        toggleRows('all');
+    });
+    tm$('#btn-show-target').on('click', function () {
+        toggleRows('only-target');
+    });
+    tm$('#btn-hide-target').on('click', function () {
+        toggleRows('hide-target');
+    });
 
 })(tm$);

@@ -76,7 +76,7 @@ document.addEventListener('keydown', function (e) {
                     empValue = '고일재';
                 } else if (/경기도|충청|대전|세종/.test(firstAddress)) {
                     empValue = '임문희';
-                } else{
+                } else {
                     empValue = '김철현';
                 }
 
@@ -84,19 +84,25 @@ document.addEventListener('keydown', function (e) {
                 // 주문자명
                 const names = ['곽정근', '정계은', '이민기', '최우진', '정두선', '정지원'];
                 // 목록에 포함되어 있으면 알림창 표시
-                if (names.includes(valueToInsert)){
+                if (names.includes(valueToInsert)) {
                     alert("고정직배 확인");
                 }
 
-                // 품목필터 목록 배열
-                // 주문자명
-                const itemFilter = ['(냉)'];
-                // 목록에 포함되어 있으면 알림창 표시
-                if (
-                    items.length >= 2 &&
-                    items.some(item => item && itemFilter.some(filter => item.includes(filter)))
-                ) {
-                    alert("냉장 제품이 포함되어 있습니다.");
+                // 품목 필터 목록
+                {
+                    const itemFilters = [
+                        {keyword: '(냉)', message: '냉장 제품이 포함되어 있습니다.'},
+                        {keyword: '배너', message: 'x-배너가 포함되어 있습니다.'},
+                        {keyword: 'SET', message: 'SET 제품이 포함되어 있습니다.'},
+                    ];
+
+                    if (items.length >= 2) {
+                        itemFilters.forEach(({keyword, message}) => {
+                            if (items.some(item => item?.includes(keyword))) {
+                                alert(message);
+                            }
+                        });
+                    }
                 }
 
                 // 거래처 입력칸(data-cid="cust")와 담당자 입력칸(data-cid="emp_cd") 감지
@@ -113,7 +119,7 @@ document.addEventListener('keydown', function (e) {
                         obs.disconnect(); // 감지 중단
                     }
                 });
-                observer.observe(document.body, { childList: true, subtree: true });
+                observer.observe(document.body, {childList: true, subtree: true});
 
                 // 5초 후 자동 중단 (타임아웃 처리)
                 setTimeout(() => {
@@ -142,7 +148,7 @@ function highlightAmtCells(node) {
         if (amtValue > 500000) {
             span.style.backgroundColor = 'yellow';
             span.style.fontWeight = 'bold';
-        } else if (amtValue === 0)  {
+        } else if (amtValue === 0) {
             span.style.backgroundColor = 'red';
             span.style.fontWeight = 'bold';
         } else {
@@ -164,4 +170,4 @@ const observerAmt = new MutationObserver((mutations) => {
     });
 });
 
-observerAmt.observe(document.body, { childList: true, subtree: true });
+observerAmt.observe(document.body, {childList: true, subtree: true});

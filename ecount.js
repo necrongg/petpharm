@@ -57,8 +57,8 @@ document.addEventListener('keydown', function (e) {
                 allCustomerSame = customers.every(cust => cust === customers[0]);
             }
 
-            //console.log("✅ allAddressSame:", allAddressSame);
-            //console.log("✅ allCustomerSame:", allCustomerSame);
+            console.log("✅ allAddressSame:", allAddressSame);
+            console.log("✅ allCustomerSame:", allCustomerSame);
 
             // 주소와 주문자가 모두 동일할 경우
             if (allAddressSame && allCustomerSame) {

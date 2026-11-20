@@ -21,9 +21,9 @@ document.addEventListener('keydown', function (e) {
                 return addressCell ? addressCell.textContent.trim() : null;
             });
 
-            // 주문자 값 추출
+            // ID 값 추출
             let customers = checkedRows.map(tr => {
-                const customerCell = tr.querySelector('td[data-label="주문자"] span');
+                const customerCell = tr.querySelector('td[data-label="ID"] span');
                 return customerCell ? customerCell.textContent.trim() : null;
             });
 
